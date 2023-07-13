@@ -2,14 +2,17 @@ const searchBtn = document.getElementById('search');
 const input = document.getElementById('movie');
 const dataEl = document.getElementById('data');
 const errEl = document.getElementById('err');
-const form = document.getElementById('form')
-const apiKey = "defb4d38"
+const form = document.getElementById('form');
+const apiKey = "defb4d38";
 let renderedMovies = [];
+let canMakeRequest = true;
 
 function fetchData() {
-  input.focus()
-  if (input.value) {
-    fetch(`https://www.omdbapi.com/?apikey=${apiKey}&t=${input.value}`)
+  input.focus();
+  if (input.value && canMakeRequest) {
+    canMakeRequest = false;
+    const genre = document.getElementById('genre').value;
+    fetch(`https://www.omdbapi.com/?apikey=${apiKey}&t=${input.value}&type=movie&genre=${genre}`)
       .then(response => response.json())
       .then(data => {
         if (data.Response === "False") {
@@ -36,16 +39,34 @@ function fetchData() {
         input.value = "";
       })
       .catch(error => {
-        errEl.innerHTML = `<h3>We're sorry, the movie "${input.value}" was not found!</h3>`;
+        errEl.textContent = `We're sorry, the movie "${input.value}" was not found!`;
+        errEl.style.display = "block";
         console.log(error);
+      })
+      .finally(() => {
+        canMakeRequest = true;
       });
   }
 }
 
 // Call the function to execute the code
-fetchData()
+fetchData();
 
 form.addEventListener('submit', (e) => {
   e.preventDefault();
-  fetchData()
-})
+  errEl.textContent = ""; // Clear previous error message
+  fetchData();
+});
+
+// Add genre filter element to the page
+const genreEl = document.createElement('select');
+genreEl.id = 'genre';
+genreEl.innerHTML = `
+  <option value="">All Genres</option>
+  <option value="Action">Action</option>
+  <option value="Comedy">Comedy</option>
+  <option value="Drama">Drama</option>
+  <option value="Horror">Horror</option>
+  <option value="Romance">Romance</option>
+`;
+form.insertBefore(genreEl, input);
