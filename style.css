@@ -3,7 +3,9 @@
 				margin: 0;
 				padding: 20px;
 			}
-
+            *{
+                font-family: Cascadia Code;
+            }
 			h1 {
 				text-align: center;
 				color: #333;
